@@ -1,6 +1,8 @@
 package pt.ipbeja.po2.sokoban.view;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
@@ -120,5 +122,13 @@ public class SokobanGUI extends BorderPane {
             dialog.close();
         }
 
+    }
+
+    class MapButtonHandler implements EventHandler<ActionEvent>{
+
+        @Override
+        public void handle(ActionEvent event) {
+
+        }
     }
 }
