@@ -113,6 +113,7 @@ public class GameBoard {
                 if (n == boxes.size()) {
                     return true;
                 }
+
             }
         }
         return false;
@@ -125,9 +126,6 @@ public class GameBoard {
                 if (positionCopy.get(i).getRow() == keeper.getLine() && positionCopy.get(i).getCol() == keeper.getCol() && (i + 1 != positionCopy.size()) && (flag < 1)) {
                     flag++;
                     moveKeeper(positionCopy.get(i + 1).getRow(), positionCopy.get(i + 1).getCol());
-                    if (this.points >= 0) {
-                        this.points++;
-                    }
                 }
             }
         }
@@ -189,6 +187,7 @@ public class GameBoard {
     }
 
     public void writeSteps(){
+        fileDta.clear();
         try {
             fileDta.add("MAP 1; ;");
             for (int i = 0; i < position.size(); i++) {
@@ -200,6 +199,8 @@ public class GameBoard {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        fileDta.clear();
     }
 
 
@@ -250,5 +251,4 @@ public class GameBoard {
         }
         return false;
     }
-
 }

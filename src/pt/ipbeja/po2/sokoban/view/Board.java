@@ -27,6 +27,7 @@ public class Board extends GridPane {
 
     public Button btnUndo;
     public Button btnRedo;
+    public Button btnSave;
     public Label label;
     public TextArea textArea;
     public Alert alert;
@@ -37,8 +38,10 @@ public class Board extends GridPane {
     public Board(GameBoard gameBoard) {
         this.gameBoard = gameBoard;
         buttons = new Buttons[this.gameBoard.getLines()][this.gameBoard.getCols()];
+
         createBoard();
         updateBoard();
+
         this.label = new Label(this.score());
         this.label.setMinSize(150, 50);
         this.textArea = new TextArea();
@@ -46,16 +49,39 @@ public class Board extends GridPane {
     }
 
 
-    private void createBoard() {
+    public void resetGame(GameBoard gameBoard){
+        this.histMoves = "Long Keeper Moves: \n";
+        this.lastPosLine = 0;
+        this.lastPosCol = 0;
+
+        this.gameBoard = gameBoard;
+        buttons = new Buttons[this.gameBoard.getLines()][this.gameBoard.getCols()];
+        this.createBoard();
+        this.updateBoard();
+
+        this.label = new Label(this.score());
+        this.label.setMinSize(150, 50);
+        this.textArea = new TextArea();
+        this.textArea.setText(histMoves);
+
+
+    }
+
+
+    public void createBoard() {
         ButtonsHandler handler = new ButtonsHandler();
         UndoButtonHandler undoButtonHandler = new UndoButtonHandler();
         RedoButtonHandler redoButtonHandler = new RedoButtonHandler();
+        SaveButtonHandler saveButtonHandler = new SaveButtonHandler();
 
         this.btnUndo = new Button("Undo");
         this.btnUndo.setOnAction(undoButtonHandler);
 
         this.btnRedo = new Button("Redo");
         this.btnRedo.setOnAction(redoButtonHandler);
+
+        this.btnSave = new Button("Save Game");
+        this.btnSave.setOnAction(saveButtonHandler);
 
         for (int line = 0; line < gameBoard.getLines(); line++) {
             for (int col = 0; col < gameBoard.getCols(); col++) {
@@ -78,6 +104,8 @@ public class Board extends GridPane {
             ;
         } else if (!cell.isWalkable() && !cell.isMarker()) {
             buttons[line][col].setWall();
+        }else {
+            buttons[line][col].setFloor();
         }
         checkForKeeper(line, col);
         checkForBox(line, col);
@@ -85,7 +113,7 @@ public class Board extends GridPane {
     }
 
 
-    private void updateBoard() {
+    public void updateBoard() {
         for (int line = 0; line < gameBoard.getLines(); line++) {
             for (int col = 0; col < gameBoard.getCols(); col++) {
                 drawBoard(line, col);
@@ -111,10 +139,6 @@ public class Board extends GridPane {
 
     private void winnigMessage() {
         String message = "";
-        String name = gameBoard.getScores().get(0).getKeeperName();
-        String level = gameBoard.getScores().get(0).getLevalName();
-        int points = gameBoard.getScores().get(0).getPoints();
-
 
         for (int i = 0; i < gameBoard.getScores().size(); i++) {
             if( i == 0){
@@ -155,7 +179,6 @@ public class Board extends GridPane {
             lastPosCol = gameBoard.getKeeper().getCol();
 
             if (gameBoard.moveKeeper(buttons.getLine(), buttons.getCol())) {
-                gameBoard.writeSteps();
                 gameBoard.positionCopy.clear();
                 textArea.setText(historicMoves());
             }
@@ -203,6 +226,14 @@ public class Board extends GridPane {
             updateBoard();
             label.setText(score());
             textArea.setText(historicMoves());
+        }
+    }
+
+    private class SaveButtonHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            gameBoard.writeSteps();
         }
     }
 

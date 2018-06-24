@@ -1,12 +1,11 @@
 package pt.ipbeja.po2.sokoban.view;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -28,24 +27,36 @@ public class SokobanGUI extends BorderPane {
     private Board board;
     public TextInputDialog dialog;
     public ChoiceDialog<String> choiceDialog;
+
     private VBox vBox;
     private HBox hBox;
-    private Button btnChoiceMaps;
+    private ComboBox comboBox;
+    private  Button newGame;
 
-    private String choiceMap = "";
+    private String choiceMap = "Default Map";
     private String name = "";
     private  String textMessage  = "Welcome, To Sokoban !!!";
 
     public SokobanGUI() {
+        ButtonHandler buttonHandler = new ButtonHandler();
+
+        this.comboBox = new ComboBox();
+        comboBox.getItems().addAll( "Default Map", "Map 1", "Map 2", "Map 3");
+        comboBox.setValue("Default Map");
+
+        this.newGame = new Button("New Game");
+        this.newGame.setOnAction(buttonHandler);
         dialogbox();
-        choicebox();
 
         chooseSwitch(this.choiceMap);
-        this.board = new Board(gameBoard);
+       this.board = new Board(gameBoard);
+
         board.keeperName = this.name;
         board.choiceMap = this.choiceMap;
+
         this.hBox = new HBox(board.btnUndo, board.btnRedo);
-        this.vBox = new VBox(board.label,this.hBox, this.btnChoiceMaps);
+        this.vBox = new VBox(board.label,this.hBox, this.comboBox, board.btnSave,this.newGame);
+
         this.setLeft(vBox);
         this.setCenter(board);
         this.setRight(board.textArea);
@@ -59,15 +70,16 @@ public class SokobanGUI extends BorderPane {
                 this.choiceMap = option;
                 break;
             case "Map 1":
-                this.gameBoard = Maps.buildSampleLevel();
+                this.gameBoard = Maps.levels(option);
                 this.choiceMap = option;
                 break;
             case "Map 2":
-                this.gameBoard = Maps.buildSampleLevel();
+                this.gameBoard = Maps.levels(option);
                 this.choiceMap = option;
+
                 break;
             case "Map 3":
-                this.gameBoard = Maps.buildSampleLevel();
+                this.gameBoard = Maps.levels(option);
                 this.choiceMap = option;
                 break;
         }
@@ -100,35 +112,20 @@ public class SokobanGUI extends BorderPane {
         }
     }
 
-    private void choicebox() {
-        List<String> choices = new ArrayList<>();
-        choices.add("Map 1");
-        choices.add("Map 2");
-        choices.add("Map 3");
-        this.choiceDialog = new ChoiceDialog<>("Default Map", choices);
-        try {
-            choiceDialog.setTitle("Choice Dialog");
-            choiceDialog.setHeaderText("Before start the game you have to chose a map to play!!!");
-            choiceDialog.setContentText("Chose the may you like:");
 
-            Optional<String> result = choiceDialog.showAndWait();
-            if (result.isPresent()) {
-                this.choiceMap =  result.get();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dialog.close();
-        }
-
-    }
-
-    class MapButtonHandler implements EventHandler<ActionEvent>{
+    class ButtonHandler implements EventHandler<ActionEvent>{
 
         @Override
         public void handle(ActionEvent event) {
+           choiceMap = (String) comboBox.getValue();
+
+            chooseSwitch(choiceMap);
+            board.resetGame(gameBoard);
+
 
         }
+
+
     }
+
 }
